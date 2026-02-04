@@ -18,18 +18,18 @@ const mapper = createMapper(schema);
 
 async function sync() {
     console.log(`🧹 Athena Deep Clean v6.1 | Blueprint: ${schema.blueprint_name}`);
-    
+
     const settingsPath = path.join(process.cwd(), 'project-settings/url-sheet.json');
     if (!fs.existsSync(settingsPath)) {
         console.error("❌ Geen url-sheet.json gevonden.");
         process.exit(1);
     }
-    
+
     let sources;
     try {
         const fileContent = fs.readFileSync(settingsPath, 'utf8');
         if (!fileContent.trim()) {
-             throw new Error("Bestand is leeg");
+            throw new Error("Bestand is leeg");
         }
         sources = JSON.parse(fileContent);
     } catch (e) {
@@ -52,10 +52,18 @@ async function sync() {
         }
 
         if (!url || !url.startsWith('http')) continue;
-        
+
         try {
             const res = await fetch(url);
             let tsv = await res.text();
+
+            // ROBUUSTHEID: Voorkom dat we HTML (foutpagina's van Google) parsen als TSV
+            if (tsv.trim().toLowerCase().startsWith('<!doctype html') || tsv.includes('<html')) {
+                console.warn(`  ⚠️  OVERSLAGEN: '${name}' ontving HTML in plaats van TSV.`);
+                console.warn(`     Zorg dat de Google Sheet 'Gepubliceerd op internet' is als TSV.`);
+                continue;
+            }
+
             let json = await csv({ delimiter: '\t', checkType: true }).fromString(tsv.replace(/^\uFEFF/, ''));
 
             const cleaned = json.map(row => {
@@ -63,7 +71,7 @@ async function sync() {
                 Object.keys(row).forEach(rawKey => {
                     const techKey = mapper.mapHeader(rawKey);
                     let val = row[rawKey];
-                    
+
                     if (typeof val === 'string') {
                         // Vertaal waarde indien nodig
                         val = mapper.mapValue(val);
@@ -83,7 +91,7 @@ async function sync() {
 
             fs.writeFileSync(path.join(process.cwd(), `src/data/${name.toLowerCase()}.json`), JSON.stringify(cleaned, null, 2));
             console.log(`  ✅ ${name}.json verwerkt via schema.`);
-            
+
         } catch (e) {
             console.error(`  ❌ Fout bij verwerken van ${name}:`, e.message);
         }

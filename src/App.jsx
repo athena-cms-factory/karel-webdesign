@@ -16,23 +16,23 @@ const App = ({ data }) => {
     if (!data.site_settings) return;
     const settings = Array.isArray(data.site_settings) ? (data.site_settings[0] || {}) : (data.site_settings || {});
     const root = document.documentElement;
-    
+
     if (settings.theme === 'dark') root.classList.add('dark');
     else root.classList.remove('dark');
 
     const mappings = {
-        primary_color: '--color-primary',
-        secondary_color: '--color-secondary',
-        accent_color: '--color-accent',
-        bg_color: '--color-background',
-        text_color: '--color-text'
+      primary_color: '--color-primary',
+      secondary_color: '--color-secondary',
+      accent_color: '--color-accent',
+      bg_color: '--color-background',
+      text_color: '--color-text'
     };
 
     Object.keys(settings).forEach(key => {
-        const varName = mappings[key];
-        if (varName && settings[key]) {
-            root.style.setProperty(varName, settings[key]);
-        }
+      const varName = mappings[key];
+      if (varName && settings[key]) {
+        root.style.setProperty(varName, settings[key]);
+      }
     });
   }, [data.site_settings]);
 
@@ -49,7 +49,7 @@ const App = ({ data }) => {
             <About data={data.about?.[0]} />
             <Contact data={data.contact?.[0]} settings={data.site_settings} />
           </main>
-          <Footer settings={data.site_settings} />
+          <Footer data={data} />
         </div>
       </Router>
     </CartProvider>

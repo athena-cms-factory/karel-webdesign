@@ -1,6 +1,22 @@
 {
   "blueprint_name": "karel-webdesign",
   "track": "docked",
+  "mapping": {
+    "titel": "title",
+    "ondertitel": "subtitle",
+    "inhoud": "content",
+    "beschrijving": "description",
+    "pakketnaam": "title",
+    "prijs": "price",
+    "kenmerken": "features_list",
+    "aanbevolen": "recommended",
+    "projectnaam": "title",
+    "tech_stack": "tech_stack",
+    "afbeelding_url": "image_url",
+    "foto_url": "image_url",
+    "icoon": "icon",
+    "volgorde": "order"
+  },
   "data_structure": [
     {
       "table_name": "site_settings",
